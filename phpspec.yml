@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: ToDo
+        psr4_prefix: ToDo
+        src_path: app
