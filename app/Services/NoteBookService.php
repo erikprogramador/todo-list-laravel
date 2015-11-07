@@ -2,9 +2,9 @@
 
 namespace ToDo\Services;
 
-use Validator;
 use ToDo\Contracts\NoteBookServiceInterface;
 use ToDo\Contracts\NoteBookRepositoryInterface;
+use ToDo\Validators\NoteBookValidator;
 
 /**
  * @author Erik Vanderlei Fernandes
@@ -14,14 +14,16 @@ class NoteBookService implements NoteBookServiceInterface
 {
 
 	protected $note;
+	protected $noteValidator;
 
 	/**
 	 * Method construct to class
 	 * @param ToDo\Contracts\NoteBookRepositoryInterface $note
 	*/
-	public function __construct(NoteBookRepositoryInterface $note)
+	public function __construct(NoteBookRepositoryInterface $note, NoteBookValidator $noteValidator)
 	{
 		$this->note = $note;
+		$this->noteValidator = $noteValidator;
 	}
 
 	/**
@@ -57,7 +59,7 @@ class NoteBookService implements NoteBookServiceInterface
 	*/
 	public function store($data)
 	{
-		if($this->validate($data)) {
+		if($this->noteValidator->formValidate($data)) {
 			return array(
 					'msg' => 'O nome do caderno é obrigatório, deve ter no maximo 255 caracteres e ser uma string!',
 					'status' => false
@@ -99,7 +101,7 @@ class NoteBookService implements NoteBookServiceInterface
 				);	
 		}
 
-		if($this->validate($data)) {
+		if($this->noteValidator->formValidate($data)) {
 			return array(
 					'msg' => 'O nome do caderno é obrigatório, deve ter no maximo 255 caracteres e ser uma string!',
 					'status' => false
@@ -152,21 +154,4 @@ class NoteBookService implements NoteBookServiceInterface
 					'status' => true
 				);
 	}
-
-	/**
-	 * Metodo para validação do form de Cadernos
-	 * @param array $data
-	 * @return boolean
-	*/
-	public function validate($data)
-	{
-		$validate = array(
-				'name' => 'required|max:255|string'
-			);
-
-		$validator = Validator::make($data, $validate);
-
-		return $validator->fails();
-	}
-
 }

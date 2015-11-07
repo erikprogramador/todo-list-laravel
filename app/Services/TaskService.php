@@ -6,6 +6,7 @@ use Validator;
 use ToDo\Contracts\TaskServiceInterface;
 use ToDo\Contracts\TaskRepositoryInterface;
 use ToDo\Contracts\NoteBookServiceInterface;
+use ToDo\Validators\TaskValidator;
 
 /**
  * @author Erik Vanderlei Fernandes
@@ -15,15 +16,17 @@ class TaskService implements TaskServiceInterface
 {
 	protected $task;
 	protected $noteService;
+	protected $taskValidator;
 
 	/**
 	 * Metodo Construtor da classe
 	 * @param ToDo\Cotracts\TaskRepositoryInterface $task
 	*/
-	public function __construct(TaskRepositoryInterface $task, NoteBookServiceInterface $noteService)
+	public function __construct(TaskRepositoryInterface $task, NoteBookServiceInterface $noteService, TaskValidator $taskValidator)
 	{
 		$this->task = $task;
 		$this->noteService = $noteService;
+		$this->taskValidator = $taskValidator;
 	}
 
 	/**
@@ -52,7 +55,7 @@ class TaskService implements TaskServiceInterface
 	*/
 	public function store($data)
 	{
-		if ($this->validate($data)) {
+		if ($this->taskValidator->formValidate($data)) {
 			return array(
 					'msg' => 'Informações invalidas!',
 					'status' => false
@@ -94,7 +97,7 @@ class TaskService implements TaskServiceInterface
 				);
 		}
 
-		if ($this->validate($data)) {
+		if ($this->taskValidator->formValidate($data)) {
 			return array(
 					'msg' => 'Informações invalidas!',
 					'status' => false
@@ -146,24 +149,6 @@ class TaskService implements TaskServiceInterface
 				'msg' => 'Tarefa deletada com sucesso!',
 				'status' => true
 			);
-	}
-
-	/**
-	 * Metodo para validação do form de Cadernos
-	 * @param array $data
-	 * @return boolean
-	*/
-	public function validate($data)
-	{
-		$validate = array(
-				'title' => 'required|max:255|string',
-				'description' => 'string',
-				'note_books_id' => 'required|integer'
-			);
-
-		$validator = Validator::make($data, $validate);
-
-		return $validator->fails();
 	}
 
 	/**
